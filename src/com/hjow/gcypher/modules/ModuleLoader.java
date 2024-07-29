@@ -25,7 +25,11 @@ public class ModuleLoader {
                 line = inp3.readLine();
                 if(line == null) break;
                 
-                register(line.trim());
+                try {
+                    register(line.trim());
+                } catch(Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         } catch(Throwable t) {
             t.printStackTrace();

@@ -92,7 +92,7 @@ public class GCypher {
         pwField = new JPasswordField(20);
         toolbar.add(pwField);
         
-        btnAct = new JButton("▶");
+        btnAct = new JButton("Convert");
         toolbar.add(btnAct);
         
         ActionListener eventAct = new ActionListener() {   

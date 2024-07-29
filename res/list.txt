@@ -1,2 +1,4 @@
 com.hjow.gcypher.modules.AESEncryptor
 com.hjow.gcypher.modules.AESDecryptor
+com.hjow.gcypher.modules.ARIAEncryptor
+com.hjow.gcypher.modules.ARIADecryptor
