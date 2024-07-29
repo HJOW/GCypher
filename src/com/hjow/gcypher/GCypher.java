@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Properties;
 import java.util.Vector;
 
@@ -24,6 +26,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
+import com.hjow.gcypher.interfaces.Disposeable;
 import com.hjow.gcypher.modules.CypherModule;
 import com.hjow.gcypher.modules.ModuleLoader;
 
@@ -42,6 +45,9 @@ public class GCypher {
     protected JPasswordField    pwField;
     protected JButton           btnAct;
     protected JMenuItem         menuAct;
+    protected GFileCypher       fileCypher;
+    
+    protected transient Vector<Disposeable> disposeables = new Vector<Disposeable>();
     
     /** GCypher 기본 생성자이자 유일한 생성자입니다. */
     public GCypher() {
@@ -63,7 +69,13 @@ public class GCypher {
         frame = new JFrame();
         frame.setSize(500, 300);
         frame.setTitle("GCypher");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // JFrame 끄면 프로그램 자체가 종료되도록
+        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        frame.addWindowListener(new WindowAdapter() {
+        	@Override
+        	public void windowClosing(WindowEvent e) {
+        		exit();
+        	}
+		});
         
         frame.setLayout(new BorderLayout());
         
@@ -72,8 +84,13 @@ public class GCypher {
         
         pnMain.setLayout(new BorderLayout());
         
+        JPanel pnCenter = new JPanel();
+        pnMain.add(pnCenter, BorderLayout.CENTER);
+        
+        pnCenter.setLayout(new BorderLayout());
+        
         splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-        pnMain.add(splitPane, BorderLayout.CENTER);
+        pnCenter.add(splitPane, BorderLayout.CENTER);
         
         before = new JTextArea();
         after  = new JTextArea();
@@ -83,7 +100,7 @@ public class GCypher {
         splitPane.setBottomComponent(new JScrollPane(after));
         
         toolbar = new JToolBar();
-        pnMain.add(toolbar, BorderLayout.NORTH);
+        pnCenter.add(toolbar, BorderLayout.NORTH);
         
         Vector<String> moduleNames = new Vector<String>();
         moduleNames.addAll(ModuleLoader.getNames());
@@ -110,16 +127,35 @@ public class GCypher {
         
         btnAct.addActionListener(eventAct);
         
-        JMenuBar menuBar = new JMenuBar();
-        frame.setJMenuBar(menuBar);
+        fileCypher = new GFileCypher(this);
+        disposeables.add(fileCypher);
         
-        JMenu menuFile = new JMenu();
-        menuBar.add(menuFile);
+        JMenuBar menuBar = new JMenuBar();
+        
+        JMenu menuFile = new JMenu("File");
         
         menuAct = new JMenuItem("Convert");
         menuAct.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_MASK));
         menuAct.addActionListener(eventAct);
         menuFile.add(menuAct);
+        
+        menuFile.addSeparator();
+        
+        JMenuItem menuFileConv = new JMenuItem("GCypher File Tool");
+        menuFileConv.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, KeyEvent.CTRL_MASK));
+        // TODO : Test File Tool and release this
+        // menuFile.add(menuFileConv);
+        menuFileConv.addActionListener(new ActionListener() {	
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						fileCypher.open();
+					}
+				});
+			}
+		});
         
         menuFile.addSeparator();
         
@@ -129,12 +165,16 @@ public class GCypher {
         menuExit.addActionListener(new ActionListener() {   
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.exit(0);
+                exit();
             }
         });
+        
+        menuBar.add(menuFile);
+        frame.setJMenuBar(menuBar);
     }
     /** UI 상에서 동작 버튼이 클릭되었을 때 호출됩니다. */
     protected void act() {
+    	after.setText("");
         String moduleName = (String) cbModule.getSelectedItem();
         CypherModule module = ModuleLoader.get(moduleName);
         
@@ -158,6 +198,19 @@ public class GCypher {
     public void open() {
         frame.setVisible(true);
         splitPane.setDividerLocation(0.5);
+    }
+    /** JFrame 객체 반환 */
+    public JFrame getFrame() {
+    	return frame;
+    }
+    /**  프로그램 종료 */
+    public void exit() {
+    	frame.setVisible(false);
+    	for(Disposeable d : disposeables) {
+    		d.dispose();
+    	}
+    	disposeables.clear();
+    	System.exit(0);
     }
     public static void main(String[] args) { new GCypher().open(); }
 }
