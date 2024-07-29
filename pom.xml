@@ -4,7 +4,53 @@
   <artifactId>gcypher</artifactId>
   <version>0.0.1</version>
   <name>GCypher</name>
+  
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+  
+  <properties>
+     <org.egovframe.rte.version>4.2.0</org.egovframe.rte.version>
+  </properties>
+  
+  <repositories>
+      <repository>
+          <id>mvn2s</id>
+          <url>https://repo1.maven.org/maven2/</url>
+          <releases>
+              <enabled>true</enabled>
+          </releases>
+          <snapshots>
+              <enabled>true</enabled>
+          </snapshots>
+      </repository>
+      <repository>
+    	<id>egovframe</id>
+    	<url>https://maven.egovframe.go.kr/maven/</url>
+    	<releases>
+    		<enabled>true</enabled>
+    	</releases>
+    	<snapshots>
+    		<enabled>false</enabled>
+    	</snapshots>
+      </repository>
+      
+      <repository>
+    	<id>java.net2</id>
+    	<name>Repository hosting the jee6 artifacts</name>
+    	<url>http://download.java.net/maven/2</url>
+      </repository>
+  </repositories>
+  
   <build>
+    <resources>
+	    <resource>
+			<directory>res/</directory>
+		</resource>
+	</resources>
     <sourceDirectory>src</sourceDirectory>
     <plugins>
       <plugin>
@@ -18,6 +64,7 @@
       <plugin>
 		  <groupId>org.apache.maven.plugins</groupId>
 		  <artifactId>maven-jar-plugin</artifactId>
+		  <version>3.4.2</version>
 		  <configuration>
 			  <archive>
 				  <manifest>
@@ -30,4 +77,22 @@
 	  </plugin>
     </plugins>
   </build>
+  <dependencies>
+	  <dependency>
+        <groupId>org.egovframe.rte</groupId>
+        <artifactId>org.egovframe.rte.ptl.mvc</artifactId>
+        <version>${org.egovframe.rte.version}</version>
+        <exclusions>
+          <exclusion>
+            <artifactId>commons-logging</artifactId>
+            <groupId>commons-logging</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+          <groupId>org.egovframe.rte</groupId>
+          <artifactId>org.egovframe.rte.fdl.crypto</artifactId>
+          <version>${org.egovframe.rte.version}</version>
+      </dependency>
+  </dependencies>
 </project>

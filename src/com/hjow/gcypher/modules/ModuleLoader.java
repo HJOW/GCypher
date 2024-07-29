@@ -1,5 +1,8 @@
 package com.hjow.gcypher.modules;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -8,10 +11,40 @@ import java.util.Vector;
 public class ModuleLoader {
     private static final List<CypherModule> modules = new Vector<CypherModule>();
     static {
-        register(new AESEncryptor());
-        register(new AESDecryptor());
+        InputStream       inp1 = null;
+        InputStreamReader inp2 = null;
+        BufferedReader    inp3 = null;
+        
+        try {
+            inp1 = ModuleLoader.class.getResourceAsStream("/list.txt");
+            inp2 = new InputStreamReader(inp1, "UTF-8");
+            inp3 = new BufferedReader(inp2);
+            
+            String line;
+            while(true) {
+                line = inp3.readLine();
+                if(line == null) break;
+                
+                register(line.trim());
+            }
+        } catch(Throwable t) {
+            t.printStackTrace();
+        } finally {
+            if(inp3 != null) try { inp3.close();  } catch(Exception ignores) {}
+            if(inp2 != null) try { inp2.close();  } catch(Exception ignores) {}
+            if(inp1 != null) try { inp1.close();  } catch(Exception ignores) {}
+        }
     }
-    
+    /** 모듈을 등록합니다. */
+    @SuppressWarnings("unchecked")
+    public static void register(String moduleClass) {
+        try {
+            Class<? extends CypherModule> moduleClassObj = (Class<? extends CypherModule>) Class.forName(moduleClass);
+            modules.add(moduleClassObj.newInstance());
+        } catch(Throwable t) {
+            t.printStackTrace();
+        }
+    }
     /** 모듈을 등록합니다. */
     public static void register(CypherModule m) {
         modules.add(m);
