@@ -171,10 +171,12 @@ public class GFileCypher implements Disposeable {
 				});
 			}
 		});
+    	
+    	ta.setText("Warning !!\n" + "This tool is not tested enough !");
     }
     
     public void act() {
-    	ta.setText("");
+    	ta.setText("Started.");
     	InputStream  inp  = null;
     	OutputStream outp = null;
     	LongCounter tsize = new LongCounter(0L);
@@ -209,17 +211,23 @@ public class GFileCypher implements Disposeable {
 				}
 			});
     		
-    		inp.close();  inp = null;
+    		inp.close();  inp  = null;
             outp.close(); outp = null;
-            ta.setText("Complete");
+            appendMsg("Success");
     	} catch(Exception ex) {
-    		ta.setText("[Error]\n" + ex.getMessage());
+    		appendMsg("[Error]\n" + ex.getMessage());
     	} finally {
     		if(inp  != null) { try { inp.close();  } catch(Exception ignores) {} }
     		if(outp != null) { try { outp.close(); } catch(Exception ignores) {} }
+    		appendMsg("Complete.");
     		
     		btnAct.setEnabled(true);
     	}
+    }
+    
+    public void appendMsg(String msg) {
+    	ta.setText(ta.getText() + "\n" + msg);
+    	ta.setCaretPosition(ta.getDocument().getLength() - 1);
     }
     
     public void open() {

@@ -143,8 +143,7 @@ public class GCypher {
         
         JMenuItem menuFileConv = new JMenuItem("GCypher File Tool");
         menuFileConv.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, KeyEvent.CTRL_MASK));
-        // TODO : Test File Tool and release this
-        // menuFile.add(menuFileConv);
+        menuFile.add(menuFileConv);
         menuFileConv.addActionListener(new ActionListener() {	
 			@Override
 			public void actionPerformed(ActionEvent e) {
