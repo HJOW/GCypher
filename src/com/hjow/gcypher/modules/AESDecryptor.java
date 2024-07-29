@@ -16,30 +16,26 @@ public class AESDecryptor implements CypherModule {
     }
 
     @Override
-    public String convert(String before, String key, Properties prop) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] digested = digest.digest(key.getBytes("UTF-8"));
-            String dgKey = Base64.getEncoder().encodeToString(digested);
-            digested = null;
-            
-            if(     dgKey.length() > 32) dgKey = dgKey.substring(0, 32);
-            else if(dgKey.length() > 24) dgKey = dgKey.substring(0, 24);
-            else if(dgKey.length() > 16) dgKey = dgKey.substring(0, 16);
-            else {
-                dgKey += "1234567890ABCDEF";
-                dgKey = dgKey.substring(0, 16);
-            }
-            
-            SecretKeySpec scKeySpec = new SecretKeySpec(dgKey.getBytes("UTF-8"), "AES");
-            
-            Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.DECRYPT_MODE, scKeySpec);
-            byte[] ciphered = cipher.doFinal(Base64.getDecoder().decode(before));
-            return new String(ciphered, "UTF-8");
-        } catch(Exception e) {
-            throw new RuntimeException("[" + e.getClass().getSimpleName() + "] " + e.getMessage(), e);
+    public String convert(String before, String key, Properties prop) throws Exception {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] digested = digest.digest(key.getBytes("UTF-8"));
+        String dgKey = Base64.getEncoder().encodeToString(digested);
+        digested = null;
+        
+        if(     dgKey.length() > 32) dgKey = dgKey.substring(0, 32);
+        else if(dgKey.length() > 24) dgKey = dgKey.substring(0, 24);
+        else if(dgKey.length() > 16) dgKey = dgKey.substring(0, 16);
+        else {
+            dgKey += "1234567890ABCDEF";
+            dgKey = dgKey.substring(0, 16);
         }
+        
+        SecretKeySpec scKeySpec = new SecretKeySpec(dgKey.getBytes("UTF-8"), "AES");
+        
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.DECRYPT_MODE, scKeySpec);
+        byte[] ciphered = cipher.doFinal(Base64.getDecoder().decode(before));
+        return new String(ciphered, "UTF-8");
     }
 
 }
