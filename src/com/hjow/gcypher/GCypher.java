@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.Properties;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -145,7 +146,7 @@ public class GCypher {
         menuAct.setEnabled(false);
         before.setEditable(false);
         try {
-            after.setText(module.convert(before.getText(), password, null));
+            after.setText(module.convert(before.getText(), password, new Properties()));
         } catch(Throwable t) {
             after.setText("[ERROR]\n" + t.getMessage());
         }

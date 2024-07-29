@@ -1,5 +1,7 @@
 package com.hjow.gcypher.modules;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -7,6 +9,8 @@ import java.util.Base64;
 import java.util.Properties;
 
 import org.egovframe.rte.fdl.cryptography.impl.ARIACipher;
+
+import com.hjow.gcypher.interfaces.ProcessingStream;
 
 public class ARIAEncryptor implements CypherModule {
     private static final long serialVersionUID = -4472795707416498577L;
@@ -38,5 +42,36 @@ public class ARIAEncryptor implements CypherModule {
         cipher.setPassword(prepareKey(key));
         
         return cipher.encrypt(before);
+	}
+	
+	@Override
+	public void convert(InputStream inputs, OutputStream outputs, String key) throws Exception {
+        convert(inputs, outputs, key, null);
+	}
+	
+	@Override
+	public void convert(InputStream inputs, OutputStream outputs, String key, ProcessingStream streamEvent) throws Exception {
+        String dpKey = prepareKey(key);
+        
+        ARIACipher cipher = new ARIACipher();
+        cipher.setPassword(dpKey);
+        
+        byte[] buffer1 = new byte[1024];
+        byte[] buffer2, buffer3;
+        int read, idx;
+        while(true) {
+        	read = inputs.read(buffer1, 0, buffer1.length);
+        	if(read < 0) break;
+        	if(streamEvent != null) streamEvent.processing(buffer1, read);
+        	buffer2 = new byte[read];
+        	for(idx=0; idx<read; idx++) { buffer2[idx] = buffer1[idx]; }
+        	buffer3 = cipher.encrypt(buffer2);
+        	if(buffer3 != null) outputs.write(buffer3);
+        }
+	}
+
+	@Override
+	public boolean supportStreamConvertion() {
+		return true;
 	}
 }

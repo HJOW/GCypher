@@ -1,5 +1,7 @@
 package com.hjow.gcypher.modules;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -8,6 +10,8 @@ import java.util.Properties;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
+
+import com.hjow.gcypher.interfaces.ProcessingStream;
 
 public class AESEncryptor implements CypherModule {
     private static final long serialVersionUID = -4472795707416498577L;
@@ -54,4 +58,34 @@ public class AESEncryptor implements CypherModule {
         return cipher.doFinal(before); 
 	}
 
+	@Override
+	public void convert(InputStream inputs, OutputStream outputs, String key) throws Exception {
+        convert(inputs, outputs, key, null);
+	}
+	
+	@Override
+	public void convert(InputStream inputs, OutputStream outputs, String key, ProcessingStream streamEvent) throws Exception {
+        SecretKeySpec scKeySpec = prepareKey(key);
+        
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.ENCRYPT_MODE, scKeySpec);
+        
+        byte[] buffer1 = new byte[1024];
+        byte[] buffer2;
+        int read;
+        while(true) {
+        	read = inputs.read(buffer1, 0, buffer1.length);
+        	if(read < 0) break;
+        	if(streamEvent != null) streamEvent.processing(buffer1, read);
+        	buffer2 = cipher.update(buffer1, 0, read);
+        	if(buffer2 != null) outputs.write(buffer2);
+        }
+        buffer2 = cipher.doFinal();
+        if(buffer2 != null) outputs.write(buffer2);
+	}
+
+	@Override
+	public boolean supportStreamConvertion() {
+		return true;
+	}
 }

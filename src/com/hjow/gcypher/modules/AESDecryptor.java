@@ -1,5 +1,7 @@
 package com.hjow.gcypher.modules;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Base64;
 import java.util.Properties;
 
@@ -33,4 +35,23 @@ public class AESDecryptor extends AESEncryptor {
         return cipher.doFinal(before);
 	}
 
+	@Override
+	public void convert(InputStream inputs, OutputStream outputs, String key) throws Exception {
+        SecretKeySpec scKeySpec = prepareKey(key);
+        
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.DECRYPT_MODE, scKeySpec);
+        
+        byte[] buffer1 = new byte[1024];
+        byte[] buffer2;
+        int read;
+        while(true) {
+        	read = inputs.read(buffer1, 0, buffer1.length);
+        	if(read < 0) break;
+        	buffer2 = cipher.update(buffer1, 0, read);
+        	if(buffer2 != null) outputs.write(buffer2);
+        }
+        buffer2 = cipher.doFinal();
+        if(buffer2 != null) outputs.write(buffer2);
+	}
 }
