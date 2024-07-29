@@ -23,12 +23,11 @@ import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
 
 import com.hjow.gcypher.interfaces.Disposeable;
 import com.hjow.gcypher.modules.CypherModule;
 import com.hjow.gcypher.modules.ModuleLoader;
+import com.hjow.gcypher.util.UIUtil;
 
 /**
  * 암/복호화 기능을 제공하는 UI 클래스입니다.
@@ -45,6 +44,7 @@ public class GCypher {
     protected JPasswordField    pwField;
     protected JButton           btnAct;
     protected JMenuItem         menuAct;
+    protected GFileHash         fileHash;
     protected GFileCypher       fileCypher;
     
     protected transient Vector<Disposeable> disposeables = new Vector<Disposeable>();
@@ -56,16 +56,10 @@ public class GCypher {
     }
     /** UI를 초기화합니다. */
     public void init() {
-        try {
-            boolean found = false;
-            for(LookAndFeelInfo infos : UIManager.getInstalledLookAndFeels()) {
-                if("Nimbus".equalsIgnoreCase(infos.getName())) {
-                    UIManager.setLookAndFeel(infos.getClassName());
-                    found = true;
-                }
-            }
-            if(!found) UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch(Exception ex) { ex.printStackTrace(); }
+    	properties.putAll(ModuleLoader.loadPropResource("/bundled.properties"));
+    	properties.putAll(ModuleLoader.loadPropResource("/config.properties"));
+    	
+    	UIUtil.applyLookAndFeel(properties);
         
         frame = new JFrame();
         frame.setSize(500, 300);
@@ -77,6 +71,7 @@ public class GCypher {
         		exit();
         	}
 		});
+        UIUtil.center(frame);
         
         frame.setLayout(new BorderLayout());
         
@@ -131,6 +126,9 @@ public class GCypher {
         fileCypher = new GFileCypher(this);
         disposeables.add(fileCypher);
         
+        fileHash = new GFileHash(this);
+        disposeables.add(fileHash);
+        
         JMenuBar menuBar = new JMenuBar();
         
         JMenu menuFile = new JMenu("File");
@@ -142,7 +140,7 @@ public class GCypher {
         
         menuFile.addSeparator();
         
-        JMenuItem menuFileConv = new JMenuItem("GCypher File Tool");
+        JMenuItem menuFileConv = new JMenuItem("GCypher File Converter");
         menuFileConv.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, KeyEvent.CTRL_MASK));
         menuFile.add(menuFileConv);
         menuFileConv.addActionListener(new ActionListener() {	
@@ -152,6 +150,21 @@ public class GCypher {
 					@Override
 					public void run() {
 						fileCypher.open();
+					}
+				});
+			}
+		});
+        
+        JMenuItem menuFileHash = new JMenuItem("GCypher File Hash");
+        menuFileHash.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_MASK));
+        menuFile.add(menuFileHash);
+        menuFileHash.addActionListener(new ActionListener() {	
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						fileHash.open();
 					}
 				});
 			}
@@ -196,10 +209,7 @@ public class GCypher {
     }
     /** UI를 열어 본격적으로 프로그램 사용을 시작합니다. */
     public void open() {
-    	properties.putAll(ModuleLoader.loadPropResource("/bundled.properties"));
-    	properties.putAll(ModuleLoader.loadPropResource("/config.properties"));
-    	
-        frame.setVisible(true);
+    	frame.setVisible(true);
         splitPane.setDividerLocation(0.5);
     }
     /** JFrame 객체 반환 */

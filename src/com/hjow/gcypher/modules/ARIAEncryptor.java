@@ -56,7 +56,7 @@ public class ARIAEncryptor implements CypherModule {
         ARIACipher cipher = new ARIACipher();
         cipher.setPassword(dpKey);
         
-        byte[] buffer1 = new byte[1024];
+        byte[] buffer1 = new byte[128];
         byte[] buffer2, buffer3;
         int read, idx;
         while(true) {
@@ -68,6 +68,7 @@ public class ARIAEncryptor implements CypherModule {
         	buffer3 = cipher.encrypt(buffer2);
         	if(buffer3 != null) outputs.write(buffer3);
         }
+        outputs.flush();
 	}
 
 	@Override

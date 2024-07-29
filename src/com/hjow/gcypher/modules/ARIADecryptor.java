@@ -39,7 +39,7 @@ public class ARIADecryptor extends ARIAEncryptor {
         ARIACipher cipher = new ARIACipher();
         cipher.setPassword(dpKey);
         
-        byte[] buffer1 = new byte[1024];
+        byte[] buffer1 = new byte[128];
         byte[] buffer2, buffer3;
         int read, idx;
         while(true) {
@@ -50,5 +50,6 @@ public class ARIADecryptor extends ARIAEncryptor {
         	buffer3 = cipher.decrypt(buffer2);
         	if(buffer3 != null) outputs.write(buffer3);
         }
+        outputs.flush();
 	}
 }

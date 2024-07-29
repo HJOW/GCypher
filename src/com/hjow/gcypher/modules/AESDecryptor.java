@@ -42,7 +42,7 @@ public class AESDecryptor extends AESEncryptor {
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.DECRYPT_MODE, scKeySpec);
         
-        byte[] buffer1 = new byte[1024];
+        byte[] buffer1 = new byte[64];
         byte[] buffer2;
         int read;
         while(true) {
@@ -53,5 +53,6 @@ public class AESDecryptor extends AESEncryptor {
         }
         buffer2 = cipher.doFinal();
         if(buffer2 != null) outputs.write(buffer2);
+        outputs.flush();
 	}
 }

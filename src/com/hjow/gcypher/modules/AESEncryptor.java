@@ -70,7 +70,7 @@ public class AESEncryptor implements CypherModule {
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.ENCRYPT_MODE, scKeySpec);
         
-        byte[] buffer1 = new byte[1024];
+        byte[] buffer1 = new byte[64];
         byte[] buffer2;
         int read;
         while(true) {
@@ -82,6 +82,7 @@ public class AESEncryptor implements CypherModule {
         }
         buffer2 = cipher.doFinal();
         if(buffer2 != null) outputs.write(buffer2);
+        outputs.flush();
 	}
 
 	@Override
