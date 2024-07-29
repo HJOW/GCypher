@@ -48,6 +48,7 @@ public class GCypher {
     protected GFileCypher       fileCypher;
     
     protected transient Vector<Disposeable> disposeables = new Vector<Disposeable>();
+    protected transient Properties properties = new Properties();
     
     /** GCypher 기본 생성자이자 유일한 생성자입니다. */
     public GCypher() {
@@ -185,7 +186,7 @@ public class GCypher {
         menuAct.setEnabled(false);
         before.setEditable(false);
         try {
-            after.setText(module.convert(before.getText(), password, new Properties()));
+            after.setText(module.convert(before.getText(), password, properties));
         } catch(Throwable t) {
             after.setText("[ERROR]\n" + t.getMessage());
         }
@@ -195,6 +196,9 @@ public class GCypher {
     }
     /** UI를 열어 본격적으로 프로그램 사용을 시작합니다. */
     public void open() {
+    	properties.putAll(ModuleLoader.loadPropResource("/bundled.properties"));
+    	properties.putAll(ModuleLoader.loadPropResource("/config.properties"));
+    	
         frame.setVisible(true);
         splitPane.setDividerLocation(0.5);
     }
