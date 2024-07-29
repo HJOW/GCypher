@@ -1,6 +1,8 @@
 package com.hjow.gcypher.modules;
 
+import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Properties;
 
@@ -14,10 +16,9 @@ public class AESEncryptor implements CypherModule {
     public String name() {
         return "AES Encryptor";
     }
-
-    @Override
-    public String convert(String before, String key, Properties prop) throws Exception {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+    
+    protected SecretKeySpec prepareKey(String key) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    	MessageDigest digest = MessageDigest.getInstance("SHA-256");
         byte[] digested = digest.digest(key.getBytes("UTF-8"));
         String dgKey = Base64.getEncoder().encodeToString(digested);
         digested = null;
@@ -31,11 +32,26 @@ public class AESEncryptor implements CypherModule {
         }
         
         SecretKeySpec scKeySpec = new SecretKeySpec(dgKey.getBytes("UTF-8"), "AES");
+        return scKeySpec;
+    }
+
+    @Override
+    public String convert(String before, String key, Properties prop) throws Exception {
+        SecretKeySpec scKeySpec = prepareKey(key);
         
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.ENCRYPT_MODE, scKeySpec);
         byte[] ciphered = cipher.doFinal(before.getBytes("UTF-8"));
         return Base64.getEncoder().encodeToString(ciphered);
     }
+
+	@Override
+	public byte[] convert(byte[] before, String key, Properties prop) throws Exception {
+        SecretKeySpec scKeySpec = prepareKey(key);
+        
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.ENCRYPT_MODE, scKeySpec);
+        return cipher.doFinal(before); 
+	}
 
 }

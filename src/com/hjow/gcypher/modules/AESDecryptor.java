@@ -1,41 +1,36 @@
 package com.hjow.gcypher.modules;
 
-import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.Properties;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-public class AESDecryptor implements CypherModule {
+public class AESDecryptor extends AESEncryptor {
     private static final long serialVersionUID = -4472795707416498577L;
 
     @Override
     public String name() {
         return "AES Decryptor";
     }
-
+    
     @Override
     public String convert(String before, String key, Properties prop) throws Exception {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] digested = digest.digest(key.getBytes("UTF-8"));
-        String dgKey = Base64.getEncoder().encodeToString(digested);
-        digested = null;
-        
-        if(     dgKey.length() > 32) dgKey = dgKey.substring(0, 32);
-        else if(dgKey.length() > 24) dgKey = dgKey.substring(0, 24);
-        else if(dgKey.length() > 16) dgKey = dgKey.substring(0, 16);
-        else {
-            dgKey += "1234567890ABCDEF";
-            dgKey = dgKey.substring(0, 16);
-        }
-        
-        SecretKeySpec scKeySpec = new SecretKeySpec(dgKey.getBytes("UTF-8"), "AES");
+        SecretKeySpec scKeySpec = prepareKey(key);
         
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.DECRYPT_MODE, scKeySpec);
         byte[] ciphered = cipher.doFinal(Base64.getDecoder().decode(before));
         return new String(ciphered, "UTF-8");
     }
+
+	@Override
+	public byte[] convert(byte[] before, String key, Properties prop) throws Exception {
+        SecretKeySpec scKeySpec = prepareKey(key);
+        
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.DECRYPT_MODE, scKeySpec);
+        return cipher.doFinal(before);
+	}
 
 }

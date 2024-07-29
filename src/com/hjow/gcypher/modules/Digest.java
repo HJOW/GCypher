@@ -18,4 +18,10 @@ public class Digest implements CypherModule {
         return Base64.getEncoder().encodeToString(digest.digest(before.getBytes("UTF-8")));
     }
 
+	@Override
+	public byte[] convert(byte[] before, String key, Properties prop) throws Exception {
+		MessageDigest digest = MessageDigest.getInstance(key);
+        return digest.digest(before);
+	}
+
 }

@@ -7,4 +7,5 @@ import java.util.Properties;
 public interface CypherModule extends Serializable {
     public String name();
     public String convert(String before, String key, Properties prop) throws Exception;
+    public byte[] convert(byte[] before, String key, Properties prop) throws Exception;
 }
