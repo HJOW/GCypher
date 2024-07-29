@@ -145,7 +145,7 @@ public class GCypher {
         menuAct.setEnabled(false);
         before.setEditable(false);
         try {
-            after.setText(module.convert(before.getText(), password));
+            after.setText(module.convert(before.getText(), password, null));
         } catch(Throwable t) {
             after.setText("[ERROR]\n" + t.getMessage());
         }

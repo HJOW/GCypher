@@ -2,6 +2,7 @@ package com.hjow.gcypher.modules;
 
 import java.security.MessageDigest;
 import java.util.Base64;
+import java.util.Properties;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -15,7 +16,7 @@ public class AESEncryptor implements CypherModule {
     }
 
     @Override
-    public String convert(String before, String key) {
+    public String convert(String before, String key, Properties prop) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] digested = digest.digest(key.getBytes("UTF-8"));

@@ -2,6 +2,7 @@ package com.hjow.gcypher.modules;
 
 import java.security.MessageDigest;
 import java.util.Base64;
+import java.util.Properties;
 
 import org.egovframe.rte.fdl.cryptography.impl.ARIACipher;
 
@@ -14,7 +15,7 @@ public class ARIAEncryptor implements CypherModule {
     }
 
     @Override
-    public String convert(String before, String key) {
+    public String convert(String before, String key, Properties prop) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] digested = digest.digest(key.getBytes("UTF-8"));
